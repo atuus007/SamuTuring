@@ -58,8 +58,10 @@
 #include <fstream>
 #include <cstring>
 #include <algorithm>
-
+#include <tuple>
 #include "orchmach1.hpp"
+
+
 
 class Perceptron
 {
@@ -1156,30 +1158,44 @@ public:
 
     std::string printSortedRules() {
 
-        std::vector<std::pair<std::pair<int, int>, int>> tmp;
+        std::vector<std::tuple<int, int, int>> tmp;
 
         for ( auto& rule : rules ) {
-            std::pair<std::pair<int, int>, int> p {{rule.first.first, rule.first.second}, rule.second};
+            auto p = std::make_tuple(rule.first.first, rule.first.second, rule.second);
             tmp.push_back ( p );
         }
+    	//lokális névtelen fv-el rendezi
+    	//
+         /*   std::sort ( std::begin ( tmp ), std::end ( tmp ),
+        /*itt a zárvány a [=]
+        névtelen objektumokat zárványokat {}-t a fv törzse
+        zárványként működik
+        lambda expression-be ű
+           [=] ( auto&& t1, auto&&t2 ) {
+                return t1.second > t2.second;
+            }
+            );
+        oldjuk meg a rendezést funktorral
+        funktort struktúrába oldjuk meg
+        majd cout-ra az egész kimenetet
+        */
+        struct {
 
-        std::sort (
-            std::begin ( tmp ), std::end ( tmp ),
-        [=] ( auto&& t1, auto&&t2 ) {
-            return t1.second > t2.second;
-        }
-        );
-
+            bool operator()(std::tuple<int, int, int> a, std::tuple<int, int, int> b){
+                return std::get<2>(a)>std::get<2>(b);
+            }
+        }asdf;
+        std::sort(tmp.begin(), tmp.end(), asdf);
         std::stringstream ss;
 
         ss << tmp.size();
 
         for ( auto& rule : tmp ) {
             //ss << ", " <<rule.first.first <<","  << rule.first.second << "(" << rule.second<< ") ";
-ss << ", " <<rule.first.first <<", "  << rule.first.second;
+            ss << ", " <<std::get<0>(rule) <<", "  << std::get<1>(rule)<<", ("<<std::get<2>(rule)<<")";
 	  
-	}
-        return ss.str();
+	   }
+       return ss.str();
 
     }
 
